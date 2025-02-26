@@ -3,6 +3,7 @@ import "./globals.css";
 import SolanaWalletProvider from "@/components/SolanaWalletProvider";
 import { Inter, Manrope } from "next/font/google";
 import { cn } from "@/lib/utils";
+import { Navbar } from "@/components/Navbar";
 
 const heading = Manrope({
   subsets: ["latin"],
@@ -28,7 +29,10 @@ export default function RootLayout({
           base.variable,
         )}
       >
-        <SolanaWalletProvider>{children}</SolanaWalletProvider>
+        <SolanaWalletProvider>
+          <Navbar />
+          {children}
+        </SolanaWalletProvider>
       </body>
     </html>
   );
