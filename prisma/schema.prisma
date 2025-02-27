@@ -23,9 +23,12 @@ model Merchant {
 }
 
 model Payment {
-  id         String   @id @default(uuid())
-  merchantId String
-  merchant   Merchant @relation(fields: [merchantId], references: [id])
-  txId       String   @unique
-  createdAt  DateTime @default(now())
+  id               String   @id @default(uuid())
+  merchantId       String
+  merchant         Merchant @relation(fields: [merchantId], references: [id])
+  transactionSign  String   @unique
+  paidToken        String
+  amount           Float
+  status           String @default("PENDING")
+  createdAt        DateTime @default(now())
 }
