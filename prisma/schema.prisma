@@ -14,21 +14,34 @@ datasource db {
 }
 
 model Merchant {
-  id            String    @id @default(uuid())
-  walletAddress String    @unique
+  id            String        @id @default(uuid())
+  walletAddress String        @unique
   businessName  String?
-  approved      Boolean   @default(false)
-  createdAt     DateTime  @default(now())
+  approved      Boolean       @default(false)
+  createdAt     DateTime      @default(now())
   payments      Payment[]
+  PaymentLinks  PaymentLink[]
 }
 
 model Payment {
-  id               String   @id @default(uuid())
-  merchantId       String
-  merchant         Merchant @relation(fields: [merchantId], references: [id])
-  transactionSign  String   @unique
-  paidToken        String
-  amount           Float
-  status           String @default("PENDING")
-  createdAt        DateTime @default(now())
+  id              String      @id @default(uuid())
+  merchantId      String
+  merchant        Merchant    @relation(fields: [merchantId], references: [id])
+  transactionSign String?     @unique
+  paidToken       String?
+  amount          Float
+  status          String      @default("PENDING")
+  paymentLinkId   String
+  paymentLink     PaymentLink @relation(fields: [paymentLinkId], references: [id])
+  createdAt       DateTime    @default(now())
+}
+
+model PaymentLink {
+  id         String    @id @default(uuid())
+  merchantId String
+  merchant   Merchant  @relation(fields: [merchantId], references: [id])
+  amount     Float
+  createdAt  DateTime  @default(now())
+  status     String    @default("ACTIVE")
+  payments   Payment[]
 }
