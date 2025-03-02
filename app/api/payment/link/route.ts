@@ -26,7 +26,7 @@ export async function GET(req: NextRequest) {
       });
     }
 
-    const paymentLinks = prisma.paymentLink.findMany({
+    const paymentLinks = await prisma.paymentLink.findMany({
       where: {
         merchantId: existingMerchant.id,
       },

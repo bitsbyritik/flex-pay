@@ -1,11 +1,5 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 import {
   Accordion,
   AccordionContent,
@@ -14,10 +8,14 @@ import {
 } from "@/components/ui/accordion";
 import GeneratePaymentLink from "@/components/GenrateLink";
 import { useMerchantAuth } from "@/hooks/useMerchantAuth";
+import { PaymentLinksTable } from "@/components/PaymentLinks";
+import { useWallet } from "@solana/wallet-adapter-react";
+import { useRouter } from "next/navigation";
 
 export default function Dashboard() {
   const { loading } = useMerchantAuth();
-
+  const { publicKey } = useWallet();
+  const router = useRouter();
   if (loading) {
     return <div>Loading</div>;
   }
@@ -43,8 +41,13 @@ export default function Dashboard() {
             </div>
           </AccordionTrigger>
           <AccordionContent>
-            Yes. It comes with default styles that matches the other
-            components&apos; aesthetic.
+            {publicKey ? (
+              <PaymentLinksTable walletAddress={publicKey.toBase58()} />
+            ) : (
+              <div className="text-red-400">
+                Please connect your wallet to view payment links.
+              </div>
+            )}
           </AccordionContent>
         </AccordionItem>
         <AccordionItem value="item-3">
