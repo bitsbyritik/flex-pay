@@ -16,11 +16,12 @@ interface Props {
 }
 
 const SolanaWalletProvider: FC<Props> = ({ children }) => {
-  const network = WalletAdapterNetwork.Devnet;
+  const endpoint: string = useMemo(
+    () => process.env.NEXT_PUBLIC_ALCHEMY_URL!,
+    [],
+  );
 
-  const endpoint = useMemo(() => clusterApiUrl(network), [network]);
-
-  const wallets = useMemo(() => [], [network]);
+  const wallets = useMemo(() => [], [endpoint]);
 
   return (
     <ConnectionProvider endpoint={endpoint}>

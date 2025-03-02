@@ -1,9 +1,8 @@
-import type { Metadata } from "next";
 import "./globals.css";
 import SolanaWalletProvider from "@/components/SolanaWalletProvider";
 import { Inter, Manrope } from "next/font/google";
 import { cn } from "@/lib/utils";
-import { Navbar } from "@/components/Navbar";
+import { Toaster } from "sonner";
 
 const heading = Manrope({
   subsets: ["latin"],
@@ -21,7 +20,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en">
       <body
         className={cn(
           "min-h-screen bg-background text-foreground antialiased font-heading relative",
@@ -30,8 +29,8 @@ export default function RootLayout({
         )}
       >
         <SolanaWalletProvider>
-          <Navbar />
           {children}
+          <Toaster />
         </SolanaWalletProvider>
       </body>
     </html>

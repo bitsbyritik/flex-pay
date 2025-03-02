@@ -6,7 +6,6 @@ import { Connection, PublicKey } from "@solana/web3.js";
 
 const JUPITER_QUOTE_API = "https://api.jup.ag/swap/v1/quote";
 const JUPITER_SWAP_API = "https://api.jup.ag/swap/v1/swap";
-const connection = new Connection("https://api.mainnet-beta.solana.com");
 
 export async function POST(req: NextRequest) {
   try {
@@ -36,20 +35,32 @@ export async function POST(req: NextRequest) {
 
     const amount = paymentLink?.amount;
     const merchantWallet = paymentLink.merchant.walletAddress;
+    let merchantTokenAccount;
+    try {
+      const USDC_MINT = new PublicKey(
+        "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+      );
 
-    const USDC_MINT = new PublicKey(
-      "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
-    );
-    const merchantPublicKey = new PublicKey(merchantWallet);
-    const merchantTokenAccount = await getAssociatedTokenAddress(
-      USDC_MINT,
-      merchantPublicKey,
-    );
+      const merchantPublicKey = new PublicKey(merchantWallet);
+      merchantTokenAccount = await getAssociatedTokenAddress(
+        USDC_MINT,
+        merchantPublicKey,
+      );
 
-    console.log(
-      "Merchant USDC Account Exists:",
-      merchantTokenAccount.toBase58(),
-    );
+      console.log(
+        "Merchant USDC Account Exists:",
+        merchantTokenAccount.toBase58(),
+      );
+    } catch (err) {
+      console.error("Merchant USDC account does not exist");
+      return NextResponse.json({
+        status: 400,
+        error: "merchant does not have usdc account",
+      });
+    }
+
+    console.log("Amount in DB", amount);
+    console.log("Amount in lamport", Math.round(amount * 10 ** 6));
 
     const quoteResponse = await axios.get(JUPITER_QUOTE_API, {
       params: {
@@ -59,7 +70,6 @@ export async function POST(req: NextRequest) {
         slippageBps: 50,
         //userPublicKey: payerWallet.toString(),
         //wrapAndUnwrapSol: true,
-        //destinationTokenAccount: merchantTokenAccount.toBase58(),
         //dynamicComputeUnitLimit: true,
         restrictIntermediateTokens: true,
       },
@@ -75,7 +85,7 @@ export async function POST(req: NextRequest) {
         body: JSON.stringify({
           quoteResponse: quoteResponse.data,
           userPublicKey: payerWallet.toString(),
-
+          destinationTokenAccount: merchantTokenAccount.toBase58(),
           // ADDITIONAL PARAMETERS TO OPTIMIZE FOR TRANSACTION LANDING
           // See next guide to optimize for transaction landing
           dynamicComputeUnitLimit: true,
@@ -104,11 +114,10 @@ export async function POST(req: NextRequest) {
         merchantId: paymentLink.merchantId,
         paidToken: "So11111111111111111111111111111111111111112",
         amount: amount,
+        payerAddress: payerWallet,
         status: "PENDING",
       },
     });
-
-    console.log(payment);
 
     return NextResponse.json({
       success: true,

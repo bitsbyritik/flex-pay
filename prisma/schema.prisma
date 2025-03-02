@@ -30,6 +30,7 @@ model Payment {
   transactionSign String?     @unique
   paidToken       String?
   amount          Float
+  payerAddress    String
   status          String      @default("PENDING")
   paymentLinkId   String
   paymentLink     PaymentLink @relation(fields: [paymentLinkId], references: [id])
@@ -37,11 +38,11 @@ model Payment {
 }
 
 model PaymentLink {
-  id         String    @id @default(uuid())
-  merchantId String
-  merchant   Merchant  @relation(fields: [merchantId], references: [id])
-  amount     Float
-  createdAt  DateTime  @default(now())
-  status     String    @default("ACTIVE")
-  payments   Payment[]
+  id          String    @id @default(uuid())
+  merchantId  String
+  merchant    Merchant  @relation(fields: [merchantId], references: [id])
+  amount      Float
+  createdAt   DateTime  @default(now())
+  status      String    @default("ACTIVE")
+  payments    Payment[]
 }
